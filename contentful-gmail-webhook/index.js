@@ -1,18 +1,16 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
 
-// Accept both standard and Contentful custom JSON content types
-app.use(bodyParser.json({
+// Modern body parser replacement
+app.use(express.json({
   type: ['application/json', 'application/vnd.contentful.management.v1+json']
 }));
 
 app.post('/webhook', (req, res) => {
-  console.log('Received webhook:', JSON.stringify(req.body, null, 2));
-
+  console.log('Raw Body:', req.body); // Debug
   const { sys, fields } = req.body || {};
 
   if (!sys) {
@@ -44,10 +42,10 @@ app.post('/webhook', (req, res) => {
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error('Error sending email:', error);
-      res.status(500).send('Email failed to send');
+      return res.status(500).send('Email failed to send');
     } else {
       console.log('Email sent:', info.response);
-      res.status(200).send('Email sent successfully');
+      return res.status(200).send('Email sent successfully');
     }
   });
 });
