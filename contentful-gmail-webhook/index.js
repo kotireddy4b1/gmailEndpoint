@@ -7,11 +7,17 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/webhook', (req, res) => {
-  console.log('Webhook received:', JSON.stringify(req.body, null, 2)); // 🔍 helpful for debugging
+  console.log('Webhook received:', JSON.stringify(req.body, null, 2));
 
-  const { sys, fields } = req.body;
+  const { sys, fields } = req.body || {};
 
-  // Extract title from array if needed
+  // Safely check if sys is present
+  if (!sys) {
+    console.error('Missing `sys` in payload');
+    return res.status(400).send('Invalid payload: Missing `sys`');
+  }
+
+  // Handle both array and object format for fields
   let titleField = 'N/A';
 
   if (Array.isArray(fields)) {
@@ -21,8 +27,9 @@ app.post('/webhook', (req, res) => {
     titleField = fields.title['en-US'];
   }
 
-  const environment = sys?.environment?.sys?.id || 'N/A';
-  const contentType = sys?.id || 'N/A';
+  const environment = sys.environment?.sys?.id || 'N/A';
+  const contentType = sys.contentType?.sys?.id || sys.id || 'N/A';
+  const entryType = sys.type || 'Entry';
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -34,9 +41,9 @@ app.post('/webhook', (req, res) => {
 
   const mailOptions = {
     from: `"Contentful Bot" <${process.env.GMAIL_USER}>`,
-    to: 'kotireddyn91@gmail.com', // 📩 Set your email here
-    subject: `Contentful Entry ${sys.type} Notification`,
-    text: `Entry ${sys.id} was updated.\n\nTitle: ${titleField}\n\nEnvironment: ${environment}\nContent Type: ${contentType}`,
+    to: 'kotireddyn91@gmail.com',
+    subject: `Contentful Entry ${entryType} Notification`,
+    text: `Entry ${sys.id || 'Unknown'} was updated.\n\nTitle: ${titleField}\n\nEnvironment: ${environment}\nContent Type: ${contentType}`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
