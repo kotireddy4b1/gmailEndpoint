@@ -56,13 +56,20 @@ An entry has been *${entryType.toUpperCase()}* in the "${environment}" environme
 
 ----------------------------------------
 📌 Entry Details:
-- 🔖 Title: ${title}
-- 🆔 Entry ID: ${entryId}
-- 🗂️ Content Type: ${contentType}
-- 🧑‍💻 Changed By: ${changedBy}
-- 🕒 Date/Time: ${timestamp}
-- 🌐 Environment: ${environment}
-- 🔧 Action: ${entryType} (${entryStatus})
+
+**🔖 Title:** ${title}
+
+**🆔 Entry ID:** ${entryId}
+
+**🗂️ Content Type:** ${contentType}
+
+**🧑‍💻 Changed By:** ${changedBy}
+
+**🕒 Date/Time:** ${timestamp}
+
+**🌐 Environment:** ${environment}
+
+**🔧 Action:** ${entryType} (${entryStatus})
 ----------------------------------------
 
 You can review the entry here:
