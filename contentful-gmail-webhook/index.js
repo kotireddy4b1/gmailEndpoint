@@ -34,7 +34,7 @@ app.post('/webhook', (req, res) => {
 
   const mailOptions = {
     from: `"Contentful Bot" <${process.env.GMAIL_USER}>`,
-    to: 'kotireddyn91@gmail.com',
+    to: 'kotireddyn91@gmail.com,koti.naru@gspann.com',
     subject: `Contentful Entry ${entryType} Notification`,
     text: `Entry ${entryId} was updated.\n\nTitle: ${title}\nEnvironment: ${environment}\nContent Type: ${contentType}`,
   };
