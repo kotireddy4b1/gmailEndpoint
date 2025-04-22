@@ -51,7 +51,6 @@ app.post('/webhook', (req, res) => {
   const updatedById = sys.updatedBy?.sys?.id || 'N/A';
   const changedBy = userMap[updatedById] || updatedById;
 
-  // Determine creation vs update
   let entryStatus = 'Updated';
   if (createdAt === updatedAt) {
     entryStatus = 'Created';
@@ -72,34 +71,53 @@ app.post('/webhook', (req, res) => {
     to: 'kotireddyn91@gmail.com,koti.naru@gspann.com',
     subject: `🔔 Contentful Notification: ${actionLabel} - "${title}"`,
     html: `
-      <p>Hello Team,</p>
-  
+      <p>Hi Team,</p>
+
       <p>This is an automated notification from Contentful.</p>
-  
-      <p>A <strong>${actionLabel}</strong> event occurred in the "<strong>${environment}</strong>" environment.</p>
-  
-      <h3>📌 Entry Details:</h3>
+
+      <p>
+        A ${actionLabel} event occurred in the "${environment}" environment.
+      </p>
+
+      <hr />
+
+      <h3>📌 <u>Entry Details</u></h3>
       <ul>
-        <li><strong>🔖 Title:</strong> ${title}</li>
-        <li><strong>🆔 Entry ID:</strong> ${entryId}</li>
-        <li><strong>🗂️ Content Type:</strong> ${contentType}</li>
-        <li><strong>🧑‍💻 Changed By:</strong> ${changedBy}</li>
-        <li><strong>🕒 Date/Time:</strong> ${timestamp}</li>
-        <li><strong>🌐 Environment:</strong> ${environment}</li>
-        <li><strong>🔧 Action Type:</strong> ${entryType} (${entryStatus})</li>
+        <li>🔖 Title: ${title}</li>
+        <li>🆔 Entry ID: ${entryId}</li>
+        <li>🗂️ Content Type: ${contentType}</li>
+        <li>🧑‍💻 Changed By: ${changedBy}</li>
+        <li>🕒 Date/Time: ${timestamp}</li>
+        <li>🌐 Environment: ${environment}</li>
+        <li>🔧 Action Type: ${entryType} (${entryStatus})</li>
       </ul>
-  
-      <p><strong>🔗 Review Entry:</strong><br/>
-      <a href="https://app.contentful.com/spaces/${spaceId}/environments/${environment}/entries/${entryId}">
-        View Entry in Contentful
-      </a></p>
-  
-      <p>If this change was not expected or needs review, please contact the CMS admin team.</p>
-  
-      <p>Best regards,<br/>
-      <em>Contentful Bot 🤖</em></p>
+      <p>
+        🔗 Review Entry:<br />
+        <a href="https://app.contentful.com/spaces/${spaceId}/environments/${environment}/entries/${entryId}" target="_blank">
+          View Entry in Contentful
+        </a>
+      </p>
+      <hr />
+      <p>
+        If this change was unexpected or requires review, please contact the CMS Admin team.
+      </p>
+
+      <p>
+        Best regards,<br />
+        <em>Contentful Bot 🤖</em>
+      </p>
     `
   };
-  
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).send('Failed to send email');
+    }
+    console.log('Email sent:', info.response);
+    res.status(200).send('Email sent successfully');
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Webhook server running on port ${PORT}`));
